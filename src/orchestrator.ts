@@ -6,7 +6,7 @@ import type {
   ScoringStrategy,
 } from "./types.js";
 import { sanitizeForTerminal } from "./pipeline/sanitize.js";
-import { isRefusal } from "./pipeline/refusal.js";
+import { isRefusal, lengthOutlierIndex } from "./pipeline/refusal.js";
 import { normalizeForScoring } from "./pipeline/normalize.js";
 
 export interface OrchestratorOptions {
@@ -72,8 +72,19 @@ export async function runComparison(
   );
 
   const responses = rawResponses.map(toPipelineResponse);
-  const succeeded = responses.filter((r) => r.status === "ok");
   const failedProviders = responses.filter((r) => r.status !== "ok").map((r) => r.provider);
+
+  // Secondary refusal signal: a length-outlier among the succeeded responses (only
+  // meaningful at n>=3, per the refusal module's own statistical constraint) is folded
+  // into isRefusal alongside the phrase-based check, since an unusually short/long
+  // response relative to the others is often a hedge or non-answer the phrase list
+  // didn't happen to match verbatim.
+  const succeeded = responses.filter((r) => r.status === "ok");
+  const outlierIdx = lengthOutlierIndex(succeeded.map((r) => r.text));
+  if (outlierIdx !== null) {
+    succeeded[outlierIdx].isRefusal = true;
+  }
+
   const refused = succeeded.filter((r) => r.isRefusal);
   const excludedForRefusal = refused.map((r) => r.provider);
   const scorable = succeeded.filter((r) => !r.isRefusal);
@@ -127,13 +138,19 @@ export async function runComparisonWithConfidenceBand(
     Array.from({ length: repeats }, () => runComparison(prompt, adapters, scoringStrategy, opts)),
   );
   const scores = runs.map((r) => r.divergenceScore).filter((s): s is number => s !== null);
-  const base = runs[0];
+  // Use the first run that actually produced a score as the template, not blindly
+  // runs[0] — runs fire concurrently, so run 0 hitting a transient per-run failure
+  // (e.g. a rate limit) while later runs succeed would otherwise return a
+  // self-contradictory result: divergenceScore: null alongside a populated
+  // confidenceBand.
+  const base = runs.find((r) => r.divergenceScore !== null) ?? runs[0];
   if (scores.length === 0) {
     return base;
   }
   return {
     ...base,
+    status: scores.length === repeats ? base.status : "partial",
     confidenceBand: { low: Math.min(...scores), high: Math.max(...scores) },
-    note: `${base.note} Ran ${repeats}x for confidence band; scores may drift run-to-run due to vendor-side inference nondeterminism, independent of temperature setting.`,
+    note: `${base.note} Ran ${repeats}x for confidence band (${scores.length}/${repeats} runs scored); scores may drift run-to-run due to vendor-side inference nondeterminism, independent of temperature setting.`,
   };
 }

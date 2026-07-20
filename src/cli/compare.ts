@@ -35,8 +35,11 @@ export async function runCompareCommand(prompt: string, options: CompareCliOptio
   if (providerNames.length === 0) {
     throw new Error("--models must list at least one provider (e.g. --models openai,anthropic,gemini)");
   }
-  if (options.repeats !== undefined && (options.repeats < 1 || options.repeats > MAX_REPEATS)) {
-    throw new Error(`--repeats must be between 1 and ${MAX_REPEATS} (each repeat makes a real, billed call per provider)`);
+  if (
+    options.repeats !== undefined &&
+    (!Number.isInteger(options.repeats) || options.repeats < 1 || options.repeats > MAX_REPEATS)
+  ) {
+    throw new Error(`--repeats must be a whole number between 1 and ${MAX_REPEATS} (each repeat makes a real, billed call per provider)`);
   }
 
   if (options.dryRun) {

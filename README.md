@@ -108,9 +108,19 @@ truthroute mcp
 - **Determinism, stated plainly:** all provider calls use `temperature=0`, which reduces but does not eliminate run-to-run variance. Vendor-side inference infrastructure (GPU batching, floating-point non-associativity) can still cause drift independent of anything this tool controls. Use `--repeats N` to get a confidence band instead of trusting a single score as exactly reproducible.
 - **A compressed score range is expected, not a bug.** Cosine-similarity scores between two responses to the same topically-related prompt naturally compress into a smaller range than a naive 0-to-1 intuition suggests. The signal that matters is relative ordering (agreement scores lower than disagreement), which is what the validation set actually checks.
 
-## How this differs from `duh`
+## How this compares
 
-[`duh`](https://github.com/msitarzewski/duh) is the closest existing open-source project: a multi-model consensus engine covering general sycophancy and verification. TruthRoute is scoped narrower and more specifically: cross-vendor factual and political divergence and refusal-pattern detection, with a checked scoring methodology and a citable, documented validation process, built as a scriptable primitive (CLI plus MCP server) for researchers embedding it into eval pipelines rather than a standalone consensus tool.
+[`duh`](https://github.com/msitarzewski/duh) is a full multi-model consensus platform: a propose/challenge/revise/commit debate protocol across 5 providers plus local models, with a web UI, REST API, WebSocket streaming, persistent SQLite/Postgres storage, auth, cost tracking, and PDF export. It is more mature and far more feature-complete than TruthRoute. TruthRoute is not trying to be a smaller version of it. TruthRoute does one narrow thing: score how much N providers' responses to the same prompt diverge, as a stateless CLI/MCP primitive with no server, no database, and no accounts to set up. If you want debate, dissent-tracking, and a full decision-audit platform, use `duh`. If you want a scriptable divergence number to drop into an existing eval pipeline or CI job with nothing to host, that is what TruthRoute is for.
+
+| | TruthRoute | `duh` |
+|---|---|---|
+| Interface | CLI, MCP server | CLI, REST API, WebSocket, MCP server, web UI |
+| Providers | OpenAI, Anthropic, Gemini (3) | Claude, GPT, Gemini, Mistral, Perplexity (5) + local via Ollama/LM Studio |
+| Storage | None (stateless) | SQLite or PostgreSQL |
+| Setup | `npm install -g truthroute-cli`, API keys as env vars | `uv add duh`, API keys, optional DB/auth setup |
+| Core output | A single divergence score (0.0-1.0), validated against a hand-labeled test set | A synthesized decision with confidence score, preserved dissent, and citations |
+| Language | TypeScript | Python |
+| License | MIT | AGPL-3.0 |
 
 TruthRoute is not an LLM gateway or router (see [LiteLLM](https://github.com/BerriAI/litellm) and [Portkey](https://github.com/Portkey-AI/gateway)). It does no routing, failover, or cost optimization. If you need those, use one of those tools. TruthRoute measures disagreement between providers; it doesn't route between them.
 

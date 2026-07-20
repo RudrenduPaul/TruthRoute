@@ -19,7 +19,7 @@ jobs:
       - name: Cache embedding model
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: ~/.cache/fastembed
-          key: fastembed-model-${{ runner.os }}-v1
+          path: ~/.cache/truthroute/fastembed
+          key: fastembed-model-${{ runner.os }}-v2
       - run: npm run build
       - run: npm test

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { runComparison, runComparisonWithConfidenceBand, estimateCost } from "../src/orchestrator.js";
 import { MockAdapter } from "../src/adapters/mock.js";
-import type { ScoringStrategy } from "../src/types.js";
+import type { ProviderAdapter, ProviderCallOptions, ProviderResponse, ScoringStrategy } from "../src/types.js";
 
 // Fake scoring strategy — deterministic, no real embedding model download, so unit
 // tests stay fast and free (per Testing & Cost Notes: CI never hits a real model for
@@ -88,6 +88,29 @@ describe("runComparison", () => {
   it("throws when zero providers are given", async () => {
     await expect(runComparison("prompt", [], new FakeScoringStrategy(), { apiKeys })).rejects.toThrow();
   });
+
+  it("excludes a length-outlier response from scoring at n=3 even without a matching refusal phrase", async () => {
+    const veryLong = "word ".repeat(200).trim();
+    const adapters = [
+      new MockAdapter("a", { text: "short answer" }),
+      new MockAdapter("b", { text: "another short one" }),
+      new MockAdapter("c", { text: veryLong }),
+    ];
+    const result = await runComparison("prompt", adapters, new FakeScoringStrategy(0.15), { apiKeys });
+    expect(result.excludedForRefusal).toEqual(["c"]);
+    expect(result.status).toBe("partial");
+  });
+
+  it("does not fire the length-outlier check at n=2 (statistically undefined)", async () => {
+    const veryLong = "word ".repeat(200).trim();
+    const adapters = [
+      new MockAdapter("a", { text: "short answer" }),
+      new MockAdapter("b", { text: veryLong }),
+    ];
+    const result = await runComparison("prompt", adapters, new FakeScoringStrategy(0.15), { apiKeys });
+    expect(result.excludedForRefusal).toEqual([]);
+    expect(result.status).toBe("complete");
+  });
 });
 
 describe("runComparisonWithConfidenceBand", () => {
@@ -111,6 +134,38 @@ describe("runComparisonWithConfidenceBand", () => {
       3,
     );
     expect(result.confidenceBand).toEqual({ low: 0.1, high: 0.3 });
+  });
+
+  it("never returns a populated confidenceBand alongside a null divergenceScore, even when the first run fails and later runs succeed", async () => {
+    // Simulates a transient per-run failure hitting only the first of several
+    // concurrent repeats (e.g. a rate limit) — runs[0] must not be blindly used as
+    // the result template if it happened to fail while later runs succeeded.
+    let callCount = 0;
+    class FlakyFirstCallAdapter implements ProviderAdapter {
+      readonly name: string;
+      constructor(name: string) {
+        this.name = name;
+      }
+      async call(_prompt: string, _opts: ProviderCallOptions): Promise<ProviderResponse> {
+        callCount++;
+        // The very first call across all providers/runs fails; everything after succeeds.
+        if (callCount === 1) {
+          return { provider: this.name, model: "mock", text: "", status: "timeout" };
+        }
+        return { provider: this.name, model: "mock", text: `response from ${this.name}`, status: "ok" };
+      }
+    }
+    const adapters = [new FlakyFirstCallAdapter("a"), new FlakyFirstCallAdapter("b")];
+    const result = await runComparisonWithConfidenceBand(
+      "prompt",
+      adapters,
+      new FakeScoringStrategy(0.25),
+      { apiKeys },
+      3,
+    );
+    if (result.confidenceBand !== null) {
+      expect(result.divergenceScore).not.toBeNull();
+    }
   });
 });
 
