@@ -6,6 +6,8 @@ Send one prompt to multiple LLMs. Get a real, validated divergence score back. N
 npx truthroute-cli compare "is the earth flat?" --models openai,anthropic,gemini
 ```
 
+![TruthRoute CLI demo: --help output, then a compare --dry-run call showing the cost estimate before any real API request is made](docs/demo.gif)
+
 ## Why this exists
 
 AI-safety and eval researchers who want to know how much LLMs from different vendors agree or disagree on a given prompt currently have two bad options: build a one-off comparison script themselves, or use a hosted, non-programmable dashboard. Neither is embeddable in an eval pipeline, and neither publishes a checked methodology. TruthRoute is a scriptable primitive built for the second use case. Call it from a script, a CI job, or an MCP-capable agent, and get back a number you can actually cite.
