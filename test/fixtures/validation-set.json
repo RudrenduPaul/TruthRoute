@@ -1,0 +1,19 @@
+{
+  "agree_pairs": [
+    ["The capital of France is Paris.", "Paris is the capital city of France."],
+    ["Water boils at 100 degrees Celsius at sea level.", "At sea level, water reaches its boiling point at 100 C."]
+  ],
+  "paraphrase_pairs": [
+    ["The meeting starts at 3pm.", "The meeting begins at three in the afternoon."],
+    ["She quickly finished her homework.", "Her homework was completed by her rapidly."]
+  ],
+  "negation_pairs": [
+    ["The Great Wall of China is visible from space with the naked eye.", "The Great Wall of China is not visible from space with the naked eye."],
+    ["Vaccines cause autism.", "Vaccines do not cause autism."],
+    ["The earth is flat.", "The earth is not flat; it is an oblate spheroid."]
+  ],
+  "disagree_pairs": [
+    ["The stock market will definitely crash next year.", "The stock market will definitely rise next year."],
+    ["This policy will help the economy.", "This policy will harm the economy."]
+  ]
+}

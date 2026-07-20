@@ -1,0 +1,37 @@
+name: No internal docs
+
+# Guards against internal-only planning/process content ever landing in this public
+# repo (CLAUDE.md, internal review-process references, fundraising language, etc.).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Fail if forbidden filenames exist
+        run: |
+          # CLAUDE.md and BRANCH_PROTECTION.md are unconditionally forbidden in a
+          # public repo. TODOS.md is normal OSS practice and only forbidden if its
+          # content leaks internal process language, which the content check below
+          # already covers.
+          if find . -iname 'CLAUDE.md' -o -iname 'BRANCH_PROTECTION.md' | grep -q .; then
+            echo "Forbidden internal-process file found in tree:"
+            find . -iname 'CLAUDE.md' -o -iname 'BRANCH_PROTECTION.md'
+            exit 1
+          fi
+      - name: Fail if internal-process language is present
+        run: |
+          if grep -rInE 'CEO review|office.?hours|eng.?review|devex review|CSO review|CSO threat.?model|/oss-[0-9]+-[a-z-]+|/plan-eng-review|Reviewer Concern|fundrais|investor.?outreach' \
+            --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=local_cache \
+            --exclude='no-internal-docs.yml' .; then
+            echo "Internal-process language found in tracked files (see matches above)."
+            exit 1
+          fi

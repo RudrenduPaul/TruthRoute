@@ -1,0 +1,38 @@
+{
+  "name": "truthroute",
+  "description": "Cross-model divergence scoring for LLMs. Sends one prompt to multiple providers and returns a divergence score, plus per-provider responses.",
+  "version": "0.1.0",
+  "invocation": {
+    "cli": {
+      "package": "truthroute-cli",
+      "bin": "truthroute",
+      "install": "npm install -g truthroute-cli"
+    },
+    "mcp": {
+      "transport": "stdio",
+      "command": "truthroute mcp",
+      "tools": ["compare"]
+    }
+  },
+  "auth": {
+    "type": "environment_variables",
+    "required": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY"],
+    "note": "Only the providers actually requested need a key set."
+  },
+  "tools": [
+    {
+      "name": "compare",
+      "description": "Send one prompt to multiple LLM providers and score how much their responses diverge.",
+      "input": {
+        "prompt": "string",
+        "providers": "array of \"openai\" | \"anthropic\" | \"gemini\""
+      },
+      "output": {
+        "divergence_score": "number 0.0-1.0, or null if fewer than 2 usable responses",
+        "responses": "array of per-provider response objects"
+      }
+    }
+  ],
+  "repository": "https://github.com/RudrenduPaul/TruthRoute",
+  "license": "MIT"
+}

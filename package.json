@@ -1,0 +1,61 @@
+{
+  "name": "truthroute-cli",
+  "version": "0.1.0",
+  "description": "Cross-model divergence scoring for LLMs. Compare responses from OpenAI, Anthropic, and Gemini side by side and get a citable, reproducible disagreement score. Built for AI-safety and eval researchers.",
+  "keywords": [
+    "llm",
+    "ai-safety",
+    "eval",
+    "evaluation",
+    "cli",
+    "divergence",
+    "bias-detection",
+    "model-comparison",
+    "agentic",
+    "mcp"
+  ],
+  "type": "module",
+  "bin": {
+    "truthroute": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".well-known"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RudrenduPaul/TruthRoute.git"
+  },
+  "homepage": "https://github.com/RudrenduPaul/TruthRoute#readme",
+  "bugs": {
+    "url": "https://github.com/RudrenduPaul/TruthRoute/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^15.0.0",
+    "fastembed": "^2.1.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "openai": "^6.48.0",
+    "@anthropic-ai/sdk": "^0.112.3",
+    "@google/genai": "^2.12.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

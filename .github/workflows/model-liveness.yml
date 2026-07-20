@@ -1,0 +1,42 @@
+name: Model liveness check
+
+# Confirms the pinned model IDs in src/adapters/*.ts still resolve against each
+# vendor's live API. This is the mechanism the design doc's Model Deprecation policy
+# depends on — vendors sunset dated model snapshots, and a tool whose core claim is
+# "citable reproducibility" needs to know when a pinned ID stops resolving.
+on:
+  schedule:
+    - cron: "0 12 * * 1" # weekly, Monday noon UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - name: Verify pinned model IDs resolve
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node --experimental-strip-types scripts/check-model-liveness.ts
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Pinned model ID no longer resolves",
+              body: "The scheduled model-liveness check failed. A pinned model ID in src/adapters/*.ts likely needs updating against the vendor's current model list. See the failed run for details.",
+              labels: ["model-deprecation"],
+            });

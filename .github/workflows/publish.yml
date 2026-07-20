@@ -1,0 +1,29 @@
+name: Publish npm package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      # First-ever publish is done manually from the maintainer's own terminal, since
+      # npm's OTP/WebAuthn flow requires a real interactive terminal. This workflow
+      # stages subsequent releases for the maintainer to approve with
+      # `npm stage approve`, never a bare `npm publish` with a stored token, since
+      # 2FA approval must stay human-gated.
+      - run: npm stage publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
