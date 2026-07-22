@@ -1,6 +1,6 @@
 {
   "name": "truthroute-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cross-model divergence scoring for LLMs. Compare responses from OpenAI, Anthropic, and Gemini side by side and get a citable, reproducible disagreement score. Built for AI-safety and eval researchers.",
   "keywords": [
     "llm",
