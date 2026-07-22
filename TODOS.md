@@ -21,7 +21,7 @@
 **Why:** Real, verified supply-chain risk chain, accepted for now since exploitation requires compromising Qdrant's GCS bucket specifically, not anything a TruthRoute user or prompt controls.
 **Pros:** Documented and tracked instead of silently accepted.
 **Cons:** No control over the fix timeline; depends on upstream (Qdrant/fastembed).
-**Context:** Found during the security audit before the repo went public, 2026-07-20. File an issue against `qdrant/fastembed` requesting either a checksum-verified download or a tar dependency bump compatible with tar v7's ESM shape.
+**Context:** Found during a routine security review, 2026-07-20. File an issue against `qdrant/fastembed` requesting either a checksum-verified download or a tar dependency bump compatible with tar v7's ESM shape.
 **Effort estimate:** S (human, filing the issue) → depends on upstream for the actual fix.
 **Priority:** P2
 **Depends on:** Upstream fastembed maintainers.

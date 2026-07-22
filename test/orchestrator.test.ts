@@ -4,8 +4,7 @@ import { MockAdapter } from "../src/adapters/mock.js";
 import type { ProviderAdapter, ProviderCallOptions, ProviderResponse, ScoringStrategy } from "../src/types.js";
 
 // Fake scoring strategy — deterministic, no real embedding model download, so unit
-// tests stay fast and free (per Testing & Cost Notes: CI never hits a real model for
-// unit tests).
+// tests stay fast and free (CI never hits a real model for unit tests).
 class FakeScoringStrategy implements ScoringStrategy {
   constructor(private readonly fixedScore = 0.42) {}
   async score(_texts: string[]): Promise<number> {

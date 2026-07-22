@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { EmbeddingScoringStrategy } from "../src/scoring/embedding-strategy.js";
 import validationSet from "./fixtures/validation-set.json" with { type: "json" };
 
-// This is the CEO-review-required validation gate: the divergence metric is the
+// This is the validation gate: the divergence metric is the
 // product's central credibility claim, and it must be checked against known
 // agree/disagree/negation/paraphrase pairs before shipping as v1's headline feature.
 // Downloads a real local embedding model on first run — CI caches it (see

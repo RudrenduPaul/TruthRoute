@@ -29,7 +29,7 @@ jobs:
           fi
       - name: Fail if internal-process language is present
         run: |
-          if grep -rInE 'CEO review|office.?hours|eng.?review|devex review|CSO review|CSO threat.?model|/oss-[0-9]+-[a-z-]+|/plan-eng-review|Reviewer Concern|fundrais|investor.?outreach' \
+          if grep -rInE 'CEO[- ]review|office.?hours|eng.?review|devex review|CSO review|CSO threat.?model|/oss-[0-9]+-[a-z-]+|/plan-eng-review|Reviewer Concern|fundrais|investor.?outreach|design doc|Testing.{0,3}(&|and).{0,3}Cost Notes' \
             --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=local_cache \
             --exclude='no-internal-docs.yml' .; then
             echo "Internal-process language found in tracked files (see matches above)."

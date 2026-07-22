@@ -1,6 +1,6 @@
 // Heuristic refusal/hedge detector — deliberately not an LLM-judge call, so it adds
-// zero extra vendor dependency and keeps latency/cost predictable. Locked at CEO
-// review: refused responses must be EXCLUDED from the divergence-score input set
+// zero extra vendor dependency and keeps latency/cost predictable. By design,
+// refused responses must be EXCLUDED from the divergence-score input set
 // entirely, not merely flagged, since "refusal boilerplate vs. real answer" text
 // distance is not factual disagreement and would otherwise dominate the score.
 const REFUSAL_PHRASES = [
