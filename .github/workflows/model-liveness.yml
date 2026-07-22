@@ -1,7 +1,7 @@
 name: Model liveness check
 
 # Confirms the pinned model IDs in src/adapters/*.ts still resolve against each
-# vendor's live API. This is the mechanism the design doc's Model Deprecation policy
+# vendor's live API. This is the mechanism this project's model-deprecation policy
 # depends on — vendors sunset dated model snapshots, and a tool whose core claim is
 # "citable reproducibility" needs to know when a pinned ID stops resolving.
 on:
