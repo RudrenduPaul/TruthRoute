@@ -45,6 +45,10 @@
     "url": "https://github.com/RudrenduPaul/TruthRoute/issues"
   },
   "license": "MIT",
+  "author": "Rudrendu Paul",
+  "contributors": [
+    "Sourav Nandy"
+  ],
   "dependencies": {
     "commander": "^15.0.0",
     "fastembed": "^2.1.0",
