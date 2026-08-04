@@ -2,11 +2,28 @@
 
 Send one prompt to multiple LLMs. Get a real, validated divergence score back. Not a vibe: a number computed from local sentence embeddings, checked against a hand-labeled agree/disagree/negation/paraphrase test set before it shipped.
 
+[![CI](https://img.shields.io/github/actions/workflow/status/RudrenduPaul/TruthRoute/ci.yml?branch=main&label=CI)](https://github.com/RudrenduPaul/TruthRoute/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/truthroute-cli)](https://www.npmjs.com/package/truthroute-cli)
+[![License: MIT](https://img.shields.io/npm/l/truthroute-cli)](LICENSE)
+
 ```bash
 npx truthroute-cli compare "is the earth flat?" --models openai,anthropic,gemini
 ```
 
 ![TruthRoute CLI demo: --help output, then a compare --dry-run call showing the cost estimate before any real API request is made](docs/demo.gif)
+
+## Contents
+
+- [Why this exists](#why-this-exists)
+- [Install](#install)
+- [Quickstart](#quickstart)
+- [CLI reference](#cli-reference)
+- [`--json` output shape](#--json-output-shape)
+- [Methodology, stated plainly](#methodology-stated-plainly)
+- [How this compares](#how-this-compares)
+- [FAQ](#faq)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Why this exists
 
@@ -24,7 +41,7 @@ Or run it without installing:
 npx truthroute-cli compare "<prompt>" --models openai,anthropic,gemini
 ```
 
-You need API keys for whichever providers you compare, set as environment variables:
+Requires Node 22.12 or later. You need API keys for whichever providers you compare, set as environment variables:
 
 ```bash
 export OPENAI_API_KEY=sk-...
@@ -60,6 +77,12 @@ For an agent to consume programmatically:
 truthroute compare "..." --models openai,anthropic --json
 ```
 
+Want to see the call count and cost estimate before spending anything:
+
+```bash
+truthroute compare "..." --models openai,anthropic,gemini --dry-run
+```
+
 ## CLI reference
 
 ```
@@ -72,7 +95,7 @@ Options:
   -m, --models <list>  comma-separated provider list (openai, anthropic, gemini)
   --json               output structured JSON instead of human-readable text
   --dry-run            estimate cost and exit without making real API calls
-  --repeats <n>        run N times, report a confidence band instead of one score
+  --repeats <n>        run N times (max 20), report a confidence band instead of one score
 
 truthroute mcp
   Runs TruthRoute as an MCP server over stdio, exposing `compare` as a typed
@@ -80,6 +103,8 @@ truthroute mcp
   surface, distinct from --json, which is for scripts, not protocol-level
   discovery.
 ```
+
+TruthRoute ships as a CLI and an MCP server, not an importable library. Its published package exposes no separate module entry point beyond the CLI binary itself, so there is nothing meant to be `import`ed into your own code. Shell out to the CLI (with `--json`) or run `truthroute mcp` if you need programmatic access.
 
 ## `--json` output shape
 
@@ -104,8 +129,8 @@ truthroute mcp
 ## Methodology, stated plainly
 
 - **Scoring:** local sentence embeddings (`fastembed`, model `BGESmallENV15`). No paid API for scoring, only the 3 providers being compared. Divergence is `1 - average pairwise cosine similarity` across all response pairs, in `[0.0, 1.0]`.
-- **Validated, not assumed.** The model was checked against a hand-labeled test set (`test/fixtures/validation-set.json`) covering agreement, paraphrase, negation, and clear disagreement before shipping. A smaller embedding model (MiniLM-L6) was tried first and rejected during that check: it scored negation pairs as *less* divergent than paraphrases, the opposite of correct. `BGESmallENV15` was chosen because it passes that check.
-- **Refusals are excluded from scoring**, not just flagged. A refusal's text distance from a real answer is not factual disagreement, and would otherwise dominate the score.
+- **Validated, not assumed.** The model is checked against a hand-labeled test set (`test/fixtures/validation-set.json`) covering agreement, paraphrase, negation, and clear disagreement, and the check runs in CI on every push. It asserts that negation pairs score meaningfully higher divergence than paraphrase pairs and that disagreeing statements score higher than agreeing ones, which is the specific failure mode a lexical/TF-IDF method would fail at.
+- **Refusals are dropped from the scoring set entirely.** Flagging alone would leave refusal boilerplate in the comparison, and its text distance from a real answer is not factual disagreement. Left in, it would dominate the score.
 - **Responses are normalized before scoring** (markdown and formatting stripped) so verbosity differences between providers aren't measured as semantic divergence.
 - **Determinism, stated plainly:** all provider calls use `temperature=0`, which reduces but does not eliminate run-to-run variance. Vendor-side inference infrastructure (GPU batching, floating-point non-associativity) can still cause drift independent of anything this tool controls. Use `--repeats N` to get a confidence band instead of trusting a single score as exactly reproducible.
 - **A compressed score range is expected, not a bug.** Cosine-similarity scores between two responses to the same topically-related prompt naturally compress into a smaller range than a naive 0-to-1 intuition suggests. The signal that matters is relative ordering (agreement scores lower than disagreement), which is what the validation set actually checks.
@@ -140,11 +165,17 @@ Any prompt you compare is sent to each vendor's API, the same as if you called t
 **Can an agent call this directly, not through a human running the CLI?**
 Yes. `truthroute mcp` runs an MCP server exposing `compare` as a typed tool over stdio for another agent to call. `--json` output is also available for scripts that shell out to the CLI directly.
 
-**Is this a library or just a CLI?**
-Both. It ships as an npm package with a CLI entry point (`truthroute`) and can be run via `npx` with no global install.
+**Is this a library I can `import`, or just a CLI?**
+Just a CLI and an MCP server. The npm package's entry point is the CLI binary itself, with no separate module surface meant for `import`. If you need programmatic access from your own code, shell out to the CLI with `--json` or run `truthroute mcp` and talk to it as an MCP tool.
+
+**How is this different from `duh`?**
+`duh` runs a multi-round debate between models and returns a synthesized decision with preserved dissent, backed by a database and a web UI. TruthRoute returns one number, how much N responses diverge, with no server or storage. Pick `duh` if you want a decision-audit platform; pick TruthRoute if you want a stateless score to drop into a script or CI job.
 
 **Why is the divergence score so much lower than I expected for two responses I'd say clearly disagree?**
 See "A compressed score range is expected" above. This is a known property of cosine-similarity scoring on topically-related text, not a bug. The validated signal is relative ordering, not the absolute number.
+
+**Can I use this commercially?**
+Yes. TruthRoute is MIT licensed, with no restriction on commercial use. You still pay the LLM vendors directly for API usage, since TruthRoute has no hosted component or markup.
 
 ## Contributing
 

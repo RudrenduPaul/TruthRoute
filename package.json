@@ -1,7 +1,7 @@
 {
   "name": "truthroute-cli",
-  "version": "0.1.1",
-  "description": "Cross-model divergence scoring for LLMs. Compare responses from OpenAI, Anthropic, and Gemini side by side and get a citable, reproducible disagreement score. Built for AI-safety and eval researchers.",
+  "version": "0.1.2",
+  "description": "Cross-model divergence scoring for LLMs. Compare responses from OpenAI, Anthropic, and Gemini side by side and get a citable, reproducible disagreement score, plus an MCP server for agent-to-agent use. Built for AI-safety and eval researchers.",
   "keywords": [
     "llm",
     "ai-safety",
@@ -12,7 +12,9 @@
     "bias-detection",
     "model-comparison",
     "agentic",
-    "mcp"
+    "mcp",
+    "mcp-server",
+    "typescript"
   ],
   "type": "module",
   "bin": {
