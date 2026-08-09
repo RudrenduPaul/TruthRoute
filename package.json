@@ -34,7 +34,8 @@
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
     "check-model-liveness": "tsx scripts/check-model-liveness.ts",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && npm test",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -62,6 +63,11 @@
     "@types/node": "^22.10.2",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10",
-    "tsx": "^4.23.1"
+    "tsx": "^4.23.1",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0"
+  },
+  "overrides": {
+    "tar": "^7.5.21"
   }
 }
