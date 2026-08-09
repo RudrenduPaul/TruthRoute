@@ -4,11 +4,11 @@
 
 Send one prompt to multiple LLMs. Get a real, validated divergence score back. Not a vibe: a number computed from local sentence embeddings, checked against a hand-labeled agree/disagree/negation/paraphrase test set before it shipped.
 
+![TruthRoute CLI demo: --help output, then a compare --dry-run call showing the cost estimate before any real API request is made](docs/demo.gif)
+
 ```bash
 npx truthroute-cli compare "is the earth flat?" --models openai,anthropic,gemini
 ```
-
-![TruthRoute CLI demo: --help output, then a compare --dry-run call showing the cost estimate before any real API request is made](docs/demo.gif)
 
 ## Why this exists
 
