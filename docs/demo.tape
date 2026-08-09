@@ -1,11 +1,15 @@
 Output docs/demo.gif
 
-Set Shell "zsh"
+Set Shell "bash"
 Set FontSize 16
-Set Width 1200
-Set Height 650
+Set Width 760
+Set Height 260
 Set Theme "Dracula"
 Set TypingSpeed 60ms
+
+Type "export PS1='$ '"
+Enter
+Sleep 300ms
 
 Sleep 1s
 
