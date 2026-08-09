@@ -1,5 +1,7 @@
 # TruthRoute
 
+[![npm version](https://img.shields.io/npm/v/truthroute-cli.svg)](https://www.npmjs.com/package/truthroute-cli)
+
 Send one prompt to multiple LLMs. Get a real, validated divergence score back. Not a vibe: a number computed from local sentence embeddings, checked against a hand-labeled agree/disagree/negation/paraphrase test set before it shipped.
 
 ```bash
