@@ -1,6 +1,9 @@
 # TruthRoute
 
 [![npm version](https://img.shields.io/npm/v/truthroute-cli.svg)](https://www.npmjs.com/package/truthroute-cli)
+[![CI](https://img.shields.io/github/actions/workflow/status/RudrenduPaul/TruthRoute/ci.yml?branch=main)](https://github.com/RudrenduPaul/TruthRoute/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](package.json)
 
 Send one prompt to multiple LLMs. Get a real, validated divergence score back. Not a vibe: a number computed from local sentence embeddings, checked against a hand-labeled agree/disagree/negation/paraphrase test set before it shipped.
 
@@ -34,7 +37,10 @@ export ANTHROPIC_API_KEY=sk-ant-...
 export GEMINI_API_KEY=...
 ```
 
-Only the providers you actually request need a key set. Every `compare` call makes real, billed calls against the vendor APIs for the providers you request. There is no free tier, because there is no hosted component at all. Use `--dry-run` to see the call count before spending anything.
+Only the providers you actually request need a key set.
+
+> [!WARNING]
+> Every `compare` call makes real, billed calls against the vendor APIs for the providers you request. There is no free tier, because there is no hosted component at all. Use `--dry-run` to see the call count before spending anything.
 
 ## Quickstart
 
