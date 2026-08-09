@@ -62,6 +62,8 @@ For an agent to consume programmatically:
 truthroute compare "..." --models openai,anthropic --json
 ```
 
+![TruthRoute compare --json --dry-run output showing the structured cost-estimate payload before any real API request is made](docs/demo-json.gif)
+
 ## CLI reference
 
 ```
@@ -110,6 +112,8 @@ truthroute mcp
 - **Refusals are excluded from scoring**, not just flagged. A refusal's text distance from a real answer is not factual disagreement, and would otherwise dominate the score.
 - **Responses are normalized before scoring** (markdown and formatting stripped) so verbosity differences between providers aren't measured as semantic divergence.
 - **Determinism, stated plainly:** all provider calls use `temperature=0`, which reduces but does not eliminate run-to-run variance. Vendor-side inference infrastructure (GPU batching, floating-point non-associativity) can still cause drift independent of anything this tool controls. Use `--repeats N` to get a confidence band instead of trusting a single score as exactly reproducible.
+
+![TruthRoute compare --repeats 3, running the comparison multiple times and reporting a confidence band instead of a single score](docs/demo-repeats.gif)
 - **A compressed score range is expected, not a bug.** Cosine-similarity scores between two responses to the same topically-related prompt naturally compress into a smaller range than a naive 0-to-1 intuition suggests. The signal that matters is relative ordering (agreement scores lower than disagreement), which is what the validation set actually checks.
 
 ## How this compares
