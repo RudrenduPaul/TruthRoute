@@ -1,7 +1,11 @@
 #!/usr/bin/env node
+import { createRequire } from "node:module";
 import { Command } from "commander";
 import { runCompareCommand } from "./cli/compare.js";
 import { runMcpServer } from "./cli/mcp.js";
+
+const require = createRequire(import.meta.url);
+const { version: cliVersion } = require("../package.json") as { version: string };
 
 const program = new Command();
 
@@ -11,7 +15,7 @@ program
     "Cross-model divergence scoring for LLMs. Compare responses from OpenAI, Anthropic, and " +
       "Gemini side by side and get a citable, reproducible disagreement score.",
   )
-  .version("0.1.0");
+  .version(cliVersion);
 
 program
   .command("compare")
