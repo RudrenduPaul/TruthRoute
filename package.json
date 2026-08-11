@@ -1,6 +1,7 @@
 {
   "name": "truthroute-cli",
-  "version": "0.1.3",
+  "version": "0.1.4",
+  "mcpName": "io.github.RudrenduPaul/truthroute",
   "description": "Cross-model divergence scoring for LLMs. Compare responses from OpenAI, Anthropic, and Gemini side by side and get a citable, reproducible disagreement score. Built for AI-safety and eval researchers.",
   "keywords": [
     "llm",

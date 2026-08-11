@@ -1,3 +1,5 @@
+<!-- mcp-name: io.github.RudrenduPaul/truthroute -->
+
 # TruthRoute
 
 [![npm version](https://img.shields.io/npm/v/truthroute-cli.svg)](https://www.npmjs.com/package/truthroute-cli)
