@@ -1,6 +1,6 @@
 {
   "name": "truthroute-cli",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "mcpName": "io.github.RudrenduPaul/truthroute",
   "description": "Cross-model divergence scoring for LLMs. Compare responses from OpenAI, Anthropic, and Gemini side by side and get a citable, reproducible disagreement score. Built for AI-safety and eval researchers.",
   "keywords": [
@@ -35,8 +35,7 @@
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
     "check-model-liveness": "tsx scripts/check-model-liveness.ts",
-    "prepublishOnly": "npm run build && npm test",
-    "postinstall": "patch-package"
+    "prepublishOnly": "npm run build && npm test"
   },
   "repository": {
     "type": "git",
@@ -64,9 +63,7 @@
     "@types/node": "^26.6.2",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1",
-    "tsx": "^4.23.15",
-    "patch-package": "^8.0.1",
-    "postinstall-postinstall": "^2.1.0"
+    "tsx": "^4.23.15"
   },
   "overrides": {
     "tar": "^7.5.21"
